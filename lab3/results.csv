@@ -1,0 +1,62 @@
+section,name,metric,value,notes
+2.tokenizers,"BPE (byte-level, tokenizers)",tokens_on_sample,117857.0,vocab=500
+2.tokenizers,"BPE (char-level, вручну)",tokens_on_sample,95571.0,vocab=500
+2.tokenizers,WordPiece,tokens_on_sample,98139.0,vocab=500
+2.tokenizers,Unigram,tokens_on_sample,94336.0,vocab=500
+3.minigpt,minigpt_v1,val_loss,3.862966299057007,"базовий; vocab=8000, ctx=128, L=4, H=4, E=256"
+3.minigpt,minigpt_v1,bits_per_char,1.731167571885167,"базовий; vocab=8000, ctx=128, L=4, H=4, E=256"
+3.minigpt,minigpt_v1,n_params,7293248.0,"базовий; vocab=8000, ctx=128, L=4, H=4, E=256"
+3.minigpt,minigpt_v2,val_loss,4.207026481628418,"більший словник; vocab=16000, ctx=128, L=4, H=4, E=256"
+3.minigpt,minigpt_v2,bits_per_char,1.66793518948183,"більший словник; vocab=16000, ctx=128, L=4, H=4, E=256"
+3.minigpt,minigpt_v2,n_params,11397248.0,"більший словник; vocab=16000, ctx=128, L=4, H=4, E=256"
+3.minigpt,minigpt_v3,val_loss,3.667893409729004,"довший контекст; vocab=8000, ctx=256, L=4, H=4, E=256"
+3.minigpt,minigpt_v3,bits_per_char,1.6437467056350468,"довший контекст; vocab=8000, ctx=256, L=4, H=4, E=256"
+3.minigpt,minigpt_v3,n_params,7326016.0,"довший контекст; vocab=8000, ctx=256, L=4, H=4, E=256"
+3.minigpt,minigpt_v4,val_loss,3.758121013641357,"глибша мережа; vocab=8000, ctx=128, L=8, H=4, E=256"
+3.minigpt,minigpt_v4,bits_per_char,1.6841817210842096,"глибша мережа; vocab=8000, ctx=128, L=8, H=4, E=256"
+3.minigpt,minigpt_v4,n_params,10449216.0,"глибша мережа; vocab=8000, ctx=128, L=8, H=4, E=256"
+5.translation,opus-mt-uk-en,BLEU,46.092,"baseline: beams=4, max_length=128"
+5.translation,opus-mt-uk-en,chrF,68.488,"baseline: beams=4, max_length=128"
+5.translation,opus-mt-uk-en,time_s,1.026,"baseline: beams=4, max_length=128"
+5.translation,opus-mt-uk-en,params_M,76.195,"baseline: beams=4, max_length=128"
+5.translation,m2m100-418M,BLEU,44.398,"baseline: beams=4, max_length=128"
+5.translation,m2m100-418M,chrF,66.24,"baseline: beams=4, max_length=128"
+5.translation,m2m100-418M,time_s,5.472,"baseline: beams=4, max_length=128"
+5.translation,m2m100-418M,params_M,483.906,"baseline: beams=4, max_length=128"
+5.translation,nllb-600M,BLEU,57.642,"baseline: beams=4, max_length=128"
+5.translation,nllb-600M,chrF,74.989,"baseline: beams=4, max_length=128"
+5.translation,nllb-600M,time_s,2.414,"baseline: beams=4, max_length=128"
+5.translation,nllb-600M,params_M,615.074,"baseline: beams=4, max_length=128"
+5.translation,"nllb-600M | базовий: beams=4, max_len=128",BLEU,57.642,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | базовий: beams=4, max_len=128",chrF,74.989,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | базовий: beams=4, max_len=128",time_s,2.076,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | жадібний: beams=1,BLEU,53.39,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | жадібний: beams=1,chrF,72.46,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | жадібний: beams=1,time_s,1.441,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | beams=2,BLEU,51.299,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | beams=2,chrF,70.868,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | beams=2,time_s,1.739,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | beams=8,BLEU,57.208,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | beams=8,chrF,74.77,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | beams=8,time_s,2.163,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, length_penalty=0.5",BLEU,56.426,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, length_penalty=0.5",chrF,74.304,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, length_penalty=0.5",time_s,1.821,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, length_penalty=2.0",BLEU,54.326,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, length_penalty=2.0",chrF,73.535,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, length_penalty=2.0",time_s,2.0,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, no_repeat_ngram=3",BLEU,57.686,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, no_repeat_ngram=3",chrF,74.999,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, no_repeat_ngram=3",time_s,2.838,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, max_length=12",BLEU,27.392,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, max_length=12",chrF,51.069,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, max_length=12",time_s,1.055,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | семплінг T=0.5,BLEU,50.751,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | семплінг T=0.5,chrF,69.103,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | семплінг T=0.5,time_s,1.62,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | семплінг T=1.0,BLEU,22.3,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | семплінг T=1.0,chrF,48.682,5.3 експерименти з налаштуваннями
+5.translation,nllb-600M | семплінг T=1.0,time_s,1.563,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, use_cache=False",BLEU,57.642,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, use_cache=False",chrF,74.989,5.3 експерименти з налаштуваннями
+5.translation,"nllb-600M | beams=4, use_cache=False",time_s,2.704,5.3 експерименти з налаштуваннями
