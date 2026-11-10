@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Картки з конспекту</title>
+<link rel="stylesheet" href="css/styles.css">
+<!--
+  Запуск: у теці app виконайте  python serve.py  і відкрийте http://localhost:8000
+  (докладніше — у README.md). Сторінку не можна відкривати подвійним кліком: модулі JS не працюють з file://.
+-->
+</head>
+<body>
+
+<header class="top">
+  <h1>Картки з конспекту</h1>
+  <nav class="tabs" role="tablist" aria-label="Розділи">
+    <button type="button" role="tab" id="tab-create" aria-controls="view-create" aria-selected="true" data-view="create">Створення</button>
+    <button type="button" role="tab" id="tab-study" aria-controls="view-study" aria-selected="false" tabindex="-1" data-view="study">Повторення <span class="count" id="dueCount"></span></button>
+    <button type="button" role="tab" id="tab-deck" aria-controls="view-deck" aria-selected="false" tabindex="-1" data-view="deck">Колода <span class="count" id="deckCount"></span></button>
+  </nav>
+  <div class="status" id="status" role="status" aria-live="polite" data-state="checking">
+    <span class="dot" aria-hidden="true"></span><span id="statusText">Перевіряю звʼязок із моделлю…</span>
+  </div>
+  <button type="button" id="openSettings">Налаштування</button>
+</header>
+
+<main>
+  <section id="view-create" role="tabpanel" aria-labelledby="tab-create">
+    <div class="create-grid">
+      <div class="notes-pane">
+        <label for="notes" class="field-title">Конспект</label>
+        <textarea id="notes" spellcheck="false" placeholder="Вставте конспект лекції або відкрийте файл .txt чи .md. Заголовки Markdown допомагають моделі зрозуміти тему."></textarea>
+        <div class="row between">
+          <div class="row">
+            <label class="file-btn" for="file" tabindex="0" id="fileLabel">Відкрити файл</label>
+            <input type="file" id="file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden>
+            <button type="button" id="sample">Вставити приклад</button>
+          </div>
+          <span id="counter" class="muted"></span>
+        </div>
+        <div class="options">
+          <label>Стиль карток
+            <select id="style">
+              <option value="qa">Питання і відповідь</option>
+              <option value="term">Термін і визначення</option>
+            </select>
+          </label>
+          <label>Мова карток
+            <select id="language">
+              <option value="uk">Українська</option>
+              <option value="en">English</option>
+              <option value="auto">Як у конспекті</option>
+            </select>
+          </label>
+          <label>Карток на фрагмент
+            <input type="number" id="cardsPerChunk" min="2" max="12" step="1">
+          </label>
+        </div>
+        <p id="plan" class="hint"></p>
+        <div class="row">
+          <button type="button" id="generate" class="primary">Створити картки</button>
+          <button type="button" id="stop" hidden>Зупинити</button>
+        </div>
+      </div>
+
+      <div class="result-pane">
+        <div id="progress" class="progress" hidden>
+          <div class="bar"><div id="barFill"></div></div>
+          <p id="progressText"></p>
+        </div>
+        <div id="notices" aria-live="polite"></div>
+        <ol id="fresh" class="cards"></ol>
+        <p id="emptyHint" class="empty">Картки зʼявлятимуться тут по одній — так, як модель їх пише. Створені картки одразу потрапляють у колоду.</p>
+        <details id="rawBox" hidden>
+          <summary>Сирий вихід моделі</summary>
+          <pre id="raw"></pre>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-study" role="tabpanel" aria-labelledby="tab-study" hidden>
+    <p id="studyEmpty" class="empty"></p>
+    <div id="studyBox" class="study" hidden>
+      <p id="studyProgress" class="muted"></p>
+      <article class="index-card big" aria-live="polite">
+        <div class="card-head"><span class="tag" id="studyTag"></span><span class="badge" id="studySuspect" hidden>Перевірте за конспектом</span></div>
+        <p class="front" id="studyFront"></p>
+        <p class="back" id="studyBack" hidden></p>
+      </article>
+      <div class="study-answer" id="answerBox">
+        <label for="myAnswer">Ваша відповідь (необовʼязково)</label>
+        <textarea id="myAnswer" rows="2" placeholder="Напишіть відповідь своїми словами — модель оцінить її за змістом"></textarea>
+        <div class="row">
+          <button type="button" id="checkAnswer" class="small">Перевірити моделлю</button>
+          <span id="gradeBusy" class="muted" hidden>Модель оцінює відповідь…</span>
+        </div>
+        <div id="gradeResult" class="grade" hidden></div>
+      </div>
+      <div class="row">
+        <button type="button" id="reveal" class="primary">Показати відповідь</button>
+        <button type="button" id="dontKnow" hidden>Не знав <kbd>1</kbd></button>
+        <button type="button" id="know" class="primary" hidden>Знав <kbd>2</kbd></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-deck" role="tabpanel" aria-labelledby="tab-deck" hidden>
+    <div class="deck-bar">
+      <h2>Колода</h2>
+      <div class="row">
+        <button type="button" id="exportAnki" class="small">Експорт для Anki</button>
+        <button type="button" id="exportCsv" class="small">CSV</button>
+        <button type="button" id="exportJson" class="small">JSON</button>
+        <label class="file-btn small" for="importJson" tabindex="0" id="importLabel" style="padding:3px 10px;font-size:13px;font-weight:500">Імпорт JSON</label>
+        <input type="file" id="importJson" accept=".json,application/json" hidden>
+        <button type="button" id="clearDeck" class="small danger">Очистити</button>
+      </div>
+    </div>
+    <p id="deckStats" class="muted"></p>
+    <div id="deckNotices"></div>
+    <ul id="deckList" class="cards grid"></ul>
+    <p id="deckEmpty" class="empty">У колоді ще немає карток. Створіть їх на вкладці «Створення» або імпортуйте JSON.</p>
+  </section>
+</main>
+
+<dialog id="settingsDialog" aria-labelledby="settingsTitle">
+  <form id="settingsForm" method="dialog">
+    <h2 id="settingsTitle">Налаштування</h2>
+    <div class="settings-grid">
+      <label>Адреса API
+        <input id="s-baseUrl" placeholder="/v1">
+        <small>«/v1» — через serve.py (рекомендовано). Пряма адреса, наприклад http://localhost:11434/v1, потребує дозволу CORS на сервері.</small>
+      </label>
+      <label>Модель
+        <input id="s-model" list="modelList" placeholder="qwen3:1.7b">
+        <datalist id="modelList"></datalist>
+        <small>Список береться з /v1/models сервера.</small>
+      </label>
+      <label>Temperature
+        <input id="s-temperature" type="number" min="0" max="2" step="0.05">
+        <small data-note="temperature"></small>
+      </label>
+      <label>Top-p
+        <input id="s-topP" type="number" min="0.05" max="1" step="0.05">
+        <small data-note="topP"></small>
+      </label>
+      <label>Ліміт токенів відповіді (max_tokens)
+        <input id="s-maxTokens" type="number" min="100" max="16000" step="50">
+        <small data-note="maxTokens"></small>
+      </label>
+      <label>Контекст сервера, токенів
+        <input id="s-contextTokens" type="number" min="1024" max="262144" step="256">
+        <small data-note="contextTokens"></small>
+      </label>
+      <label>Міркування моделі
+        <select id="s-reasoning">
+          <option value="none">Вимкнути (reasoning_effort: none)</option>
+          <option value="default">Не передавати параметр</option>
+        </select>
+        <small data-note="reasoning"></small>
+      </label>
+      <label>Структурований вивід
+        <select id="s-structured">
+          <option value="json_schema">json_schema (строга схема)</option>
+          <option value="json_object">json_object (будь-який JSON)</option>
+          <option value="off">Вимкнено</option>
+        </select>
+        <small data-note="structured"></small>
+      </label>
+      <label>Seed (порожньо — випадковий)
+        <input id="s-seed" type="number" step="1">
+        <small>Фіксує випадковість: з однаковим seed і temperature відповідь повторюється.</small>
+      </label>
+      <label>Ключ API
+        <input id="s-apiKey" type="password" placeholder="локально не потрібен" autocomplete="off">
+      </label>
+      <label>Таймаут першого токена, с
+        <input id="s-firstTokenTimeoutS" type="number" min="5" max="1800" step="5">
+        <small>Перший запит може завантажувати модель у памʼять, тож значення велике.</small>
+      </label>
+      <label>Таймаут паузи між токенами, с
+        <input id="s-idleTimeoutS" type="number" min="5" max="600" step="5">
+        <small>Якщо модель мовчить довше — генерацію перериваємо, готові картки лишаються.</small>
+      </label>
+    </div>
+    <p id="settingsError" role="alert" hidden></p>
+    <menu>
+      <button type="button" id="resetSettings">Типові значення</button>
+      <button type="button" id="cancelSettings">Скасувати</button>
+      <button type="submit" id="saveSettings" class="primary" value="ok">Зберегти</button>
+    </menu>
+  </form>
+</dialog>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

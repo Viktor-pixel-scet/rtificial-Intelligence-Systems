@@ -1,0 +1,11 @@
+{
+  "name": "cardsmith",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Картки з конспекту: застосунок на локальній LLM через OpenAI-сумісний API",
+  "scripts": {
+    "start": "python serve.py",
+    "test": "node --test"
+  }
+}
